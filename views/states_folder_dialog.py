@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import (
     QDialog,
     QFrame,
@@ -48,6 +48,7 @@ class StatesFolderDialog(QDialog):
 
         self.setLayout(self.window_layout)
 
+    @Slot()
     def on_ok_button_clicked(self):
         settings.retroarch_path = self.folder_le.text()
         if settings.states_path and settings.states_path.exists():
@@ -58,6 +59,7 @@ class StatesFolderDialog(QDialog):
             self.folder_le.style().polish(self.folder_le)
             self.folder_le.update()
 
+    @Slot()
     def on_browse_button_clicked(self):
         user_path = QFileDialog.getExistingDirectory(
             parent=self,
