@@ -62,18 +62,6 @@ class Manager:
         else:
             return 0
 
-    def get_game_card(self, name: str) -> dict[str, list[str]]:
-        card = {}
-        game = [g for g in self.games if g.name == name][0]
-
-        card["name"] = game.name
-        card["states"] = []
-        for state in game.states:
-            state_text = "Auto" if state.number == -1 else str(state.number)
-            card["states"].append(state_text)
-
-        return card
-
     @classmethod
     def load(cls):
         cls = cls()
