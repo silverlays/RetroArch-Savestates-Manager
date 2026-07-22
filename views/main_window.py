@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtWidgets import QApplication, QWidget, QSplitter, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QWidget, QSplitter, QVBoxLayout, QMessageBox
 
 from views.left_panel import LeftPanel
 from views.right_panel import RightPanel
@@ -62,7 +62,18 @@ class MainWindow(QWidget):
         self.manager.move_slot(name, state_number, new_slot_number)
 
     @Slot(str, int)
-    def on_delete_state_request(self, name: str, state_number: int):
+    def on_delete_state_request(self, name: str, state_number: int) -> None:
+        if settings.ask_confirmation:
+            reply = QMessageBox.warning(
+                self,
+                "Confirm Deletion",
+                f"Are you sure you want to delete slot #{state_number} ?",
+                buttons=QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                defaultButton=QMessageBox.StandardButton.No,
+            )
+            if reply != QMessageBox.StandardButton.Yes:
+                return
+
         self.manager.delete_state(name, state_number)
 
     @Slot()

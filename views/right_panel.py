@@ -77,6 +77,7 @@ class StateCard(QFrame):
         )
         layout.addWidget(self.delete_button)
 
+    @Slot()
     def on_change_slot_button_clicked(self):
         dialog = ChangeSlotDialog(self.state_number, self)
         if dialog.exec() == ChangeSlotDialog.DialogCode.Accepted:
