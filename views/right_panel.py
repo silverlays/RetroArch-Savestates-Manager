@@ -13,6 +13,8 @@ from PySide6.QtWidgets import (
     QCheckBox,
 )
 
+from views.change_slot_dialog import ChangeSlotDialog
+
 from manager import Game, State
 
 
@@ -25,8 +27,10 @@ class StateCard(QFrame):
     state_number_label: QLabel
     picture_label: QLabel
     delete_button: QPushButton
+    change_slot_button: QPushButton
 
-    delete_state = Signal(str, int)
+    change_slot = Signal(str, int, int)  # name, state_number, new_slot_number
+    delete_state = Signal(str, int)  # name, state_number
 
     def __init__(self, game_name: str, state: State):
         super().__init__()
@@ -61,6 +65,7 @@ class StateCard(QFrame):
         self.change_slot_button = QPushButton("🔄 CHANGE SLOT")
         self.change_slot_button.setObjectName("change_slot_button")
         self.change_slot_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.change_slot_button.clicked.connect(self.on_change_slot_button_clicked)
         layout.addWidget(self.change_slot_button)
 
         # Delete Button
@@ -71,6 +76,16 @@ class StateCard(QFrame):
             lambda: self.delete_state.emit(self.game_name, self.state_number)
         )
         layout.addWidget(self.delete_button)
+
+    def on_change_slot_button_clicked(self):
+        dialog = ChangeSlotDialog(self.state_number, self)
+        if dialog.exec() == ChangeSlotDialog.DialogCode.Accepted:
+            new_slot = (
+                -1
+                if dialog.new_slot_combobox.currentText() == "Auto"
+                else int(dialog.new_slot_combobox.currentText())
+            )
+            self.change_slot.emit(self.game_name, self.state_number, new_slot)
 
 
 # endregion
@@ -102,7 +117,8 @@ class RightPanel(QGroupBox):
     scroll_area: QScrollArea
     delete_confirmation: QCheckBox
 
-    delete_requested = Signal(str, int)
+    change_slot_requested = Signal(str, int, int)  # name, state_number, new_slot_number
+    delete_requested = Signal(str, int)  # name, state_number
 
     def __init__(self):
         super().__init__()
@@ -141,6 +157,7 @@ class RightPanel(QGroupBox):
 
         for state in game.states:
             card = self.cards_container.add_state(game.name, state)
+            card.change_slot.connect(self.change_slot_requested.emit)
             card.delete_state.connect(self.delete_requested.emit)
 
         self.scroll_area.setWidget(self.cards_container)

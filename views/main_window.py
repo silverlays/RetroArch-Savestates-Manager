@@ -21,7 +21,7 @@ class MainWindow(QWidget):
 
         # Window Properties
         self.setWindowTitle(f"{c.APP_NAME} v{c.APP_VERSION[0]}.{c.APP_VERSION[1]}")
-        self.setMinimumHeight(500)
+        self.setMinimumHeight(550)
 
         # Left Panel
         self.left_panel.list_widget.refresh(self.manager.games)
@@ -31,11 +31,12 @@ class MainWindow(QWidget):
         self.splitter.addWidget(self.left_panel)
 
         # Right Panel
+        self.right_panel.change_slot_requested.connect(self.on_change_slot_request)
+        self.right_panel.delete_requested.connect(self.on_delete_state_request)
         self.right_panel.delete_confirmation.setChecked(settings.ask_confirmation)
         self.right_panel.delete_confirmation.stateChanged.connect(
             lambda c: setattr(settings, "ask_confirmation", bool(c))
         )
-        self.right_panel.delete_requested.connect(self.on_delete_state_request)
         self.splitter.addWidget(self.right_panel)
 
         if self.left_panel.list_widget.count() > 0:
@@ -53,6 +54,12 @@ class MainWindow(QWidget):
     def on_game_selection_changed(self, name: str):
         if game := self.manager.get_game(name):
             self.right_panel.update_cards(game)
+
+    @Slot(str, int, int)
+    def on_change_slot_request(
+        self, name: str, state_number: int, new_slot_number: int
+    ):
+        self.manager.move_slot(name, state_number, new_slot_number)
 
     @Slot(str, int)
     def on_delete_state_request(self, name: str, state_number: int):

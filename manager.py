@@ -82,7 +82,7 @@ class Manager(QObject):
             self.games.sort(key=lambda k: k.name)
 
     def delete_state(self, name: str, state_number: int):
-        # TODO Finish this
+        # TODO delete_state() Implement real delete
         if game := self.get_game(name):
             if state := self.get_state(name, state_number):
                 game.states.remove(state)
@@ -109,6 +109,22 @@ class Manager(QObject):
         if game := self.get_game(name):
             return next((s for s in game.states if s.number == state_number), None)
         return None
+
+    def move_slot(self, name: str, state_number: int, new_slot_number: int):
+        # TODO move_slot() Implement real slot change
+        if game := self.get_game(name):
+            if state := self.get_state(name, state_number):
+                pixmap = state.pixmap
+                state_path = state.state_path
+
+                if not next(
+                    (s for s in game.states if s.number == new_slot_number), None
+                ):
+                    # FIXME Handle pixmap switch
+                    game.states.remove(state)
+                    game.add_state(State(new_slot_number, pixmap, state_path))
+
+        self.update_needed.emit()
 
     def _extract_from_path(self, path: Path):
         if path.suffix == ".png":
