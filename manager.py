@@ -57,11 +57,11 @@ class Manager(QObject):
                     game_name = state_path.stem
                     state_number = int(state_path.suffix.split(".state")[1])
 
-                if not self.get_game(game_name):
+                game = self.get_game(game_name)
+                if not game:
                     self.games.append(Game(game_name, state_number, state_path))
                 else:
-                    if game := self.get_game(game_name):
-                        game.add_state(State(state_number, state_path))
+                    game.add_state(State(state_number, state_path))
 
             self.games.sort(key=lambda k: k.name)
 
