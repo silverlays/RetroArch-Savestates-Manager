@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
 from settings import settings
 
 
-class StatesFolderDialog(QDialog):
+class RetroarchFolderDialog(QDialog):
     def __init__(self):
         super().__init__()
 

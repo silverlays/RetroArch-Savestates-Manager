@@ -2,8 +2,11 @@ import sys
 
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
+
+from views.retroarch_folder_dialog import RetroarchFolderDialog
 from views.main_window import MainWindow
 
+from settings import settings
 import constants as c
 
 
@@ -160,6 +163,13 @@ if __name__ == "__main__":
     app.setApplicationVersion(".".join(map(str, c.APP_VERSION)))
     app.setWindowIcon(QIcon("app.ico"))
     app.setStyleSheet(get_style())
+
+    if not settings.retroarch_path:
+        dialog = RetroarchFolderDialog()
+        dialog.exec()
+        if not settings.retroarch_path:
+            sys.exit(0)
+
     mainwindow = MainWindow()
     mainwindow.show()
     sys.exit(app.exec())

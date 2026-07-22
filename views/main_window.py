@@ -3,8 +3,6 @@ from PySide6.QtWidgets import QApplication, QWidget, QSplitter, QVBoxLayout
 
 from views.left_panel import LeftPanel
 from views.right_panel import RightPanel
-from views.right_panel import RightPanel
-from views.states_folder_dialog import StatesFolderDialog
 
 import constants as c
 from manager import Manager
@@ -16,7 +14,6 @@ class MainWindow(QWidget):
         super().__init__()
 
         self.manager = Manager()
-        self.states_folder_dialog = StatesFolderDialog()
         layout = QVBoxLayout(self)
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.left_panel = LeftPanel()
@@ -47,9 +44,6 @@ class MainWindow(QWidget):
 
         # Center window before show
         self.center_on_screen()
-
-        while not settings.retroarch_path:
-            self.states_folder_dialog.exec()
 
     @Slot(str)
     def on_game_selection_changed(self, name: str):
