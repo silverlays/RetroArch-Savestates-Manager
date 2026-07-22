@@ -12,6 +12,7 @@ from settings import settings
 class State:
     number: int
     pixmap: QPixmap
+    state_path: Path
 
     @staticmethod
     def create_pixmap(path: Path | None = None) -> QPixmap:
@@ -41,7 +42,7 @@ class Game:
     def __init__(self, name: str, number: int, pixmap: QPixmap):
         self.states = []
         self.name = name
-        self.add_state(State(number, pixmap))
+        self.add_state(State(number, pixmap, state_path))
 
     def add_state(self, state: State):
         existing_state = next(
@@ -74,9 +75,9 @@ class Manager(QObject):
                 game = self.get_game(game_name)
 
                 if not game:
-                    self.games.append(Game(game_name, state_number, pixmap))
+                    self.games.append(Game(game_name, state_number, pixmap, path))
                 else:
-                    game.add_state(State(state_number, pixmap))
+                    game.add_state(State(state_number, pixmap, path))
 
             self.games.sort(key=lambda k: k.name)
 
