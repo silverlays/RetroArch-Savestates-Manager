@@ -8,310 +8,217 @@ from views.main_window import MainWindow
 
 from settings import settings
 import constants as c
+import app_rc
 
 
 # region QSS Style
-def get_style():
+def get_style() -> str:
     return """
-QScrollArea {
-    border: none;
-    background-color: transparent;
-}
+    /* --- Base Variables & Global Widget --- */
+    QWidget {
+        background-color: #212121;
+        color: #f0f0f0;
+        font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+        font-size: 10pt;
+    }
 
-QLineEdit {
-    background-color: #1a1a1a;
-    border: 1px solid #333333;
-    border-radius: 6px;
-    padding: 6px 10px;
-    color: #e0e0e0;
-}
+    /* --- GroupBoxes (Left & Right Panels) --- */
+    QGroupBox {
+        background-color: transparent;
+        border: 1px solid #333333;
+        border-radius: 6px;
+        margin-top: 25px;
+        padding-top: 15px;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        subcontrol-position: top left;
+        left: 10px;
+        padding: 0 5px;
+        color: #888888;
+        font-weight: bold;
+    }
 
-QLineEdit:focus {
-    border: 1px solid #00e5ff;
-}
+    /* --- Left Panel: Game List --- */
+    QListWidget#game_list_widget {
+        background-color: transparent;
+        border: none;
+        outline: none; /* Supprime le rectangle de focus pointillé */
+    }
+    QListWidget#game_list_widget::item {
+        padding: 12px 8px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        color: #cccccc;
+        font-weight: bold;
+    }
+    QListWidget#game_list_widget::item:hover {
+        background-color: #2a2a2a;
+    }
+    QListWidget#game_list_widget::item:selected {
+        border: 1px solid #00d4d0;
+        background-color: rgba(0, 212, 208, 0.05);
+        color: #00d4d0;
+    }
 
-QLineEdit[hasError="true"] {
-    border: 1px solid #ff4444;
-    background-color: #2a1515;
-}
+    /* --- Right Panel: Header & Labels --- */
+    QLabel#game_label {
+        font-size: 22pt;
+        font-weight: bold;
+        color: #00d4d0;
+        padding-bottom: 10px;
+    }
+    QLabel#state_number_label {
+        color: #2ecc71;
+        font-size: 12pt;
+        font-weight: bold;
+    }
+    QLabel[class="description"] {
+        color: #aaaaaa;
+        font-size: 11pt;
+    }
 
-/* --- Dialogs & Labels --- */
-QDialog {
-    background-color: #121212;
-}
+    /* --- State Card (QFrame) --- */
+    QFrame#state_frame {
+        background-color: #181818;
+        border: 1px solid #333333;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 5px;
+    }
 
-QDialog QLabel {
-    font-size: 10pt;
-    color: #e0e0e0;
-}
+    /* --- ScrollArea & ScrollBars --- */
+    QScrollArea {
+        border: none;
+        background-color: transparent;
+    }
+    QScrollBar:horizontal {
+        border: none;
+        background: #2b2b2b;
+        height: 12px;
+        margin: 0px;
+        border-radius: 6px;
+    }
+    QScrollBar::handle:horizontal {
+        background: #555555;
+        min-width: 30px;
+        border-radius: 6px;
+    }
+    QScrollBar::handle:horizontal:hover {
+        background: #00d4d0;
+    }
+    QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+        width: 0px;
+    }
 
-QLabel[class="description"] {
-    font-family: "Segoe UI", "Arial", sans-serif;
-    font-size: 10pt;
-    font-weight: normal;
-    color: #a0a0a0;
-    margin-bottom: 4px;
-}
+    /* --- Buttons --- */
+    QPushButton {
+        background-color: #2a2a2a;
+        color: #f0f0f0;
+        border: 1px solid #444444;
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-weight: bold;
+    }
+    QPushButton:hover {
+        background-color: #383838;
+        border: 1px solid #666666;
+    }
+    QPushButton:pressed {
+        background-color: #1c1c1c;
+    }
 
-/* --- QComboBox --- */
-QComboBox {
-    background-color: #1a1a1a;
-    border: 1px solid #333333;
-    border-radius: 6px;
-    padding: 6px 10px;
-    color: #e0e0e0;
-    font-size: 10pt;
-    font-weight: bold;
-}
+    QPushButton#change_slot_button {
+        background-color: #181818;
+        color: #ffffff;
+        border: 1px solid #00d4d0;
+        margin-top: 10px;
+    }
+    QPushButton#change_slot_button:hover {
+        background-color: rgba(0, 212, 208, 0.1);
+    }
 
-QComboBox:hover {
-    border: 1px solid #00e5ff;
-    background-color: #222222;
-}
+    QPushButton#delete_button {
+        background-color: #6b1717;
+        color: #ffffff;
+        border: 1px solid #8f1f1f;
+        margin-top: 5px;
+    }
+    QPushButton#delete_button:hover {
+        background-color: #8f1f1f;
+        border: 1px solid #b32727;
+    }
 
-QComboBox:on, QComboBox:focus {
-    border: 1px solid #00e5ff;
-    background-color: #1e2d38;
-}
+    /* --- ComboBox (Dialog) --- */
+    QComboBox {
+        background-color: #181818;
+        color: #ffffff;
+        border: 1px solid #00d4d0;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 11pt;
+        font-weight: bold;
+    }
+    QComboBox:hover {
+        background-color: #212121;
+    }
+    QComboBox::drop-down {
+        subcontrol-origin: padding;
+        subcontrol-position: top right;
+        width: 30px;
+        border-left-width: 0px;
+    }
+    QComboBox::down-arrow {
+        image: url(:/assets/arrow_down.png);
+        width: 14px;
+        height: 14px;
+    }
+    QComboBox QAbstractItemView {
+        background-color: #212121;
+        color: #f0f0f0;
+        border: 1px solid #00d4d0;
+        selection-background-color: #00d4d0;
+        selection-color: #000000;
+        outline: none;
+    }
 
-QComboBox::drop-down {
-    subcontrol-origin: padding;
-    subcontrol-position: center right;
-    width: 28px;
-    border: none;
-}
+    /* --- LineEdit (RetroarchFolderDialog) --- */
+    QLineEdit {
+        background-color: #181818;
+        color: #ffffff;
+        border: 1px solid #444444;
+        border-radius: 4px;
+        padding: 6px 10px;
+    }
+    QLineEdit:focus {
+        border: 1px solid #00d4d0;
+    }
+    QLineEdit[hasError="true"] {
+        border: 1px solid #e74c3c;
+    }
 
-QComboBox::down-arrow {
-    image: none;
-    width: 0px;
-    height: 0px;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid #888888;
-    margin-right: 8px;
-}
-
-QComboBox:hover::down-arrow, QComboBox:on::down-arrow {
-    border-top-color: #00e5ff;
-}
-
-QComboBox QAbstractItemView {
-    background-color: #1a1a1a;
-    border: 1px solid #00e5ff;
-    border-radius: 6px;
-    padding: 4px;
-    color: #b0b0b0;
-    outline: none;
-    font-size: 10pt;
-}
-
-QComboBox QAbstractItemView::item {
-    min-height: 28px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 10pt;
-}
-
-QComboBox QAbstractItemView::item:hover {
-    background-color: #282828;
-    color: #ffffff;
-}
-
-QComboBox QAbstractItemView::item:selected {
-    background-color: #1e2d38;
-    color: #00e5ff;
-    font-weight: bold;
-}
-
-/* --- QDialogButtonBox (Boutons OK / Cancel) --- */
-QDialogButtonBox QPushButton {
-    font-size: 10pt;
-    font-weight: bold;
-    min-height: 32px;
-    min-width: 75px;
-    border-radius: 6px;
-    padding: 0 12px;
-    color: #b0b0b0;
-    background-color: #1a1a1a;
-    border: 1px solid #333333;
-}
-
-QDialogButtonBox QPushButton:hover {
-    background-color: #282828;
-    border-color: #555555;
-    color: #ffffff;
-}
-
-QDialogButtonBox QPushButton:pressed {
-    background-color: #111111;
-}
-
-QDialogButtonBox QPushButton[default="true"] {
-    color: #ffffff;
-    background-color: #1e2d38;
-    border: 1px solid #00e5ff;
-}
-
-QDialogButtonBox QPushButton[default="true"]:hover {
-    background-color: #283e4e;
-    border-color: #33ebff;
-}
-
-QDialogButtonBox QPushButton[default="true"]:pressed {
-    background-color: #152028;
-    border-color: #00b8cc;
-}
-
-/* --- Vue principale --- */
-#game_label {
-    font-size: 28px;
-    font-weight: bold;
-    color: #00e5ff;
-}
-
-#state_number_label {
-    font-size: 16px;
-    font-weight: bold;
-    color: #2ecc71;
-}
-
-#picture_label {
-    background-color: #111111;
-    border: 1px solid #333333;
-    border-radius: 8px;
-}
-
-#delete_button {
-    font-size: 13px;
-    font-weight: bold;
-    min-height: 34px;
-    color: #ffffff;
-    background-color: #7a1515;
-    border: 1px solid #991b1b;
-    border-radius: 6px;
-    padding: 0 16px;
-}
-
-#delete_button:hover {
-    background-color: #991b1b;
-    border-color: #ef4444;
-}
-
-#delete_button:pressed {
-    background-color: #dc2626;
-    border-color: #f87171;
-}
-
-#delete_button:disabled {
-    background-color: #222222;
-    border: 1px solid #333333;
-    color: #555555;
-}
-
-#change_slot_button {
-    font-size: 13px;
-    font-weight: bold;
-    min-height: 34px;
-    color: #ffffff;
-    background-color: #1e2d38;
-    border: 1px solid #00e5ff;
-    border-radius: 6px;
-    padding: 0 16px;
-}
-
-#change_slot_button:hover {
-    background-color: #283e4e;
-    border-color: #33ebff;
-}
-
-#change_slot_button:pressed {
-    background-color: #152028;
-    border-color: #00b8cc;
-}
-
-#change_slot_button:disabled {
-    background-color: #222222;
-    border: 1px solid #333333;
-    color: #555555;
-}
-
-QGroupBox {
-    border: 1px solid #333333;
-    border-radius: 8px;
-    margin-top: 12px;
-    font-weight: bold;
-    color: #888888;
-}
-
-QGroupBox::title {
-    subcontrol-origin: margin;
-    subcontrol-position: top left;
-    left: 10px;
-    padding: 0 5px;
-}
-
-#game_list_widget {
-    background-color: #1a1a1a;
-    border: 1px solid #333333;
-    border-radius: 8px;
-    padding: 4px;
-    outline: none;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-#game_list_widget::item {
-    color: #b0b0b0;
-    padding: 8px 10px;
-    margin-bottom: 2px;
-    border-radius: 5px;
-    border-left: 3px solid transparent;
-}
-
-#game_list_widget::item:hover {
-    background-color: #282828;
-    color: #ffffff;
-}
-
-#game_list_widget::item:selected {
-    background-color: #1e2d38;
-    color: #00e5ff;
-    border-left: 3px solid #00e5ff;
-    font-weight: bold;
-}
-
-#game_list_widget QScrollBar:vertical {
-    background: transparent;
-    width: 6px;
-    margin: 4px 2px;
-}
-
-#game_list_widget QScrollBar::handle:vertical {
-    background: #3a3a3a;
-    border-radius: 3px;
-    min-height: 20px;
-}
-
-#game_list_widget QScrollBar::handle:vertical:hover {
-    background: #00e5ff;
-}
-
-#game_list_widget QScrollBar::add-line:vertical,
-#game_list_widget QScrollBar::sub-line:vertical {
-    height: 0px;
-}
-
-#state_frame {
-    background-color: #1a1a1a;
-    border: 1px solid #333333;
-    border-radius: 8px;
-}
-
-#state_frame:hover {
-    border: 1px solid #00e5ff;
-    background-color: #222222;
-}
-"""
+    /* --- CheckBox --- */
+    QCheckBox {
+        color: #cccccc;
+        spacing: 10px;
+        font-size: 10pt;
+    }
+    QCheckBox::indicator {
+        width: 18px;
+        height: 18px;
+        border: 1px solid #555555;
+        border-radius: 4px;
+        background-color: #181818;
+    }
+    QCheckBox::indicator:hover {
+        border: 1px solid #00d4d0;
+    }
+    QCheckBox::indicator:checked {
+        background-color: rgba(0, 212, 208, 0.2);
+        border: 1px solid #00d4d0;
+        image: url(:/assets/check.png);
+    }
+    """
 
 
 # endregion
@@ -322,7 +229,7 @@ if __name__ == "__main__":
     app.setOrganizationName(c.ORGANISATION_NAME)
     app.setApplicationName(c.APP_NAME)
     app.setApplicationVersion(".".join(map(str, c.APP_VERSION)))
-    app.setWindowIcon(QIcon("app.ico"))
+    app.setWindowIcon(QIcon(":/app.ico"))
     app.setStyleSheet(get_style())
 
     if not settings.retroarch_path:
