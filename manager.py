@@ -112,23 +112,27 @@ class Manager(QObject):
 
     def _extract_from_path(self, path: Path):
         if path.suffix == ".png":
+            emulator = path.parts[-2]
             game_name = path.stem.split(path.suffix[0])[0]
             state_number = int(path.suffixes[0].split(".state")[1])
             pixmap = State.create_pixmap(path)
         elif path.suffix == ".auto":
+            emulator = path.parts[-2]
             game_name = path.stem.split(path.suffix[0])[0]
             state_number = -1
             pixmap = State.create_pixmap()
         elif path.suffix == ".state":
+            emulator = path.parts[-2]
             game_name = path.stem
             state_number = 0
             pixmap = State.create_pixmap()
         else:
+            emulator = path.parts[-2]
             game_name = path.stem
             state_number = int(path.suffix.split(".state")[1])
             pixmap = State.create_pixmap()
 
-        return (game_name, state_number, pixmap)
+        return (f"{game_name} -- {emulator}", state_number, pixmap)
 
 
 # endregion
