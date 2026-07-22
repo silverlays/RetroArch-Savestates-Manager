@@ -52,6 +52,8 @@ class Game:
         else:
             self.states.append(state)
 
+        self.states.sort(key=lambda k: k.number)
+
 
 # endregion
 
