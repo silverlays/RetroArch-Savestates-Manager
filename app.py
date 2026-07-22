@@ -101,6 +101,8 @@ QGroupBox::title {
     border-radius: 8px;
     padding: 4px;
     outline: none;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 #game_list_widget::item {
