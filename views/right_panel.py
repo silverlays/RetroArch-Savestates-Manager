@@ -137,7 +137,7 @@ class RightPanel(QGroupBox):
         self.scroll_area.setVerticalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
-        self.scroll_area.setFixedWidth(800)
+        self.scroll_area.setFixedWidth(1000)
         self.scroll_area.wheelEvent = self.scroll_area_wheelEvent
         layout.addWidget(self.scroll_area)
 

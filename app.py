@@ -43,14 +43,15 @@ def get_style() -> str:
     QListWidget#game_list_widget {
         background-color: transparent;
         border: none;
-        outline: none; /* Supprime le rectangle de focus pointillé */
+        outline: none;
+        font-size: 12pt;
+        font-weight: bold;
     }
     QListWidget#game_list_widget::item {
         padding: 12px 8px;
         border: 1px solid transparent;
         border-radius: 4px;
         color: #cccccc;
-        font-weight: bold;
     }
     QListWidget#game_list_widget::item:hover {
         background-color: #2a2a2a;

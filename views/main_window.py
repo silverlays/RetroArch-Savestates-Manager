@@ -21,7 +21,7 @@ class MainWindow(QWidget):
 
         # Window Properties
         self.setWindowTitle(f"{c.APP_NAME} v{c.APP_VERSION[0]}.{c.APP_VERSION[1]}")
-        self.setMinimumHeight(600)
+        self.setMinimumHeight(700)
 
         # Left Panel
         self.left_panel.list_widget.refresh(self.manager.games)
