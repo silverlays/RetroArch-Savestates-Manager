@@ -49,6 +49,7 @@ class StateCard(QFrame):
         )
         layout.addWidget(self.state_number_label)
 
+        # Picture (Pixmap) Label
         self.picture_label = QLabel()
         self.picture_label.setObjectName("picture_label")
         self.picture_label.setContentsMargins(0, 10, 0, 10)
@@ -56,6 +57,14 @@ class StateCard(QFrame):
         self.picture_label.setPixmap(self.pixmap)
         layout.addWidget(self.picture_label)
 
+        # Change Slot Button
+        self.change_slot_button = QPushButton("🔄 CHANGE SLOT")
+        self.change_slot_button.setObjectName("change_slot_button")
+        self.change_slot_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.change_slot_button.clicked.connect(self.on_change_slot_button_clicked)
+        layout.addWidget(self.change_slot_button)
+
+        # Delete Button
         self.delete_button = QPushButton("🗑️ DELETE")
         self.delete_button.setObjectName("delete_button")
         self.delete_button.setCursor(Qt.CursorShape.PointingHandCursor)
