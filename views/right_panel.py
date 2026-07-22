@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 from manager import Game, State
 
 
+# region StateCard
 class StateCard(QFrame):
     game_name: str
     state_number: int
@@ -63,6 +64,10 @@ class StateCard(QFrame):
         layout.addWidget(self.delete_button)
 
 
+# endregion
+
+
+# region CardsContainer
 class CardsContainer(QWidget):
     def __init__(self):
         super().__init__()
@@ -93,6 +98,10 @@ class CardsContainer(QWidget):
         return pixmap
 
 
+# endregion
+
+
+# region RightPanel
 class RightPanel(QGroupBox):
     game: Game
 
@@ -148,3 +157,6 @@ class RightPanel(QGroupBox):
             event.accept()
         else:
             super().wheelEvent(event)
+
+
+# endRegion

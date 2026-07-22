@@ -5,6 +5,7 @@ from PySide6.QtCore import QObject, Signal
 from settings import settings
 
 
+# region State
 class State:
     number: int
     path: Path
@@ -18,6 +19,10 @@ class State:
         self.image_path = image_path if image_path.exists() else None
 
 
+# endregion
+
+
+# region Game
 class Game:
     states: list[State]
     name: str
@@ -35,6 +40,10 @@ class Game:
             self.states.append(state)
 
 
+# endregion
+
+
+# region Manager
 class Manager(QObject):
     games: list[Game]
     update_needed = Signal()
@@ -93,3 +102,6 @@ class Manager(QObject):
         if game := self.get_game(name):
             return next((s for s in game.states if s.number == state_number), None)
         return None
+
+
+# endregion

@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
 from manager import Game
 
 
+# region GameList
 class GameList(QListWidget):
     game_selection_changed = Signal(str)
 
@@ -31,6 +32,10 @@ class GameList(QListWidget):
         self.setMinimumWidth(needed_width)
 
 
+# endregion
+
+
+# region LeftPanel
 class LeftPanel(QGroupBox):
     list_widget: GameList
 
@@ -43,3 +48,6 @@ class LeftPanel(QGroupBox):
 
         self.list_widget = GameList()
         layout.addWidget(self.list_widget)
+
+
+# endregion
