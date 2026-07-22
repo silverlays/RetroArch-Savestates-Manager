@@ -10,6 +10,7 @@ from settings import settings
 import constants as c
 
 
+# region QSS Style
 def get_style():
     return """
 QScrollArea {
@@ -155,6 +156,8 @@ QGroupBox::title {
 }
 """
 
+
+# endregion
 
 if __name__ == "__main__":
     app = QApplication()
