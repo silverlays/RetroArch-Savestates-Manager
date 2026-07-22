@@ -10,9 +10,7 @@ class Settings(QSettings):
 
     @property
     def ask_confirmation(self) -> bool:
-        if not "ask_confirmation" in self.allKeys():
-            self.setValue("ask_confirmation", True)
-        return bool(self.value("ask_confirmation"))
+        return bool(self.value("ask_confirmation", True, type=bool))
 
     @ask_confirmation.setter
     def ask_confirmation(self, value: bool) -> None:
