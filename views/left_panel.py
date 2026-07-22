@@ -5,17 +5,25 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from manager import manager
+from manager import Game
 
 
 class GameList(QListWidget):
+    game_selection_changed = Signal(str)
+
     def __init__(self):
         super().__init__()
 
         self.setObjectName("game_list_widget")
+        self.game_list = []
 
-        for game in manager.games_string():
-            self.addItem(game)
+        self.currentTextChanged.connect(self.game_selection_changed)
+
+    def refresh(self, game_list: list[Game]):
+        self.clear()
+
+        for game in game_list:
+            self.addItem(game.name)
 
         needed_width = self.sizeHintForColumn(0)
         needed_width += self.frameWidth() * 2
@@ -24,7 +32,7 @@ class GameList(QListWidget):
 
 
 class LeftPanel(QGroupBox):
-    update_right_panel = Signal(str)
+    list_widget: GameList
 
     def __init__(self):
         super().__init__()
@@ -34,5 +42,4 @@ class LeftPanel(QGroupBox):
         layout = QVBoxLayout(self)
 
         self.list_widget = GameList()
-        self.list_widget.currentTextChanged.connect(self.update_right_panel.emit)
         layout.addWidget(self.list_widget)

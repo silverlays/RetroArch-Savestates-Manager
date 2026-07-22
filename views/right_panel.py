@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, Signal, Slot
-from PySide6.QtGui import QPixmap, QPainter, QColor, QFont, QWheelEvent
+from PySide6.QtGui import QPixmap, QImage, QPainter, QColor, QFont, QWheelEvent
 from PySide6.QtWidgets import (
     QGroupBox,
     QFrame,
@@ -12,18 +12,27 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 
-from manager import manager
+from manager import Game, State
 
 
-class StateFrame(QFrame):
+class StateCard(QFrame):
+    game_name: str
+    state_number: int
+    pixmap: QPixmap | None
+
     state_number_label: QLabel
     picture_label: QLabel
     delete_button: QPushButton
 
-    def __init__(self, state_number: int):
+    delete_state = Signal(str, int)
+
+    def __init__(self, game_name: str, state: State, pixmap: QPixmap):
         super().__init__()
 
-        self.state_number = state_number
+        self.game_name = game_name
+        self.state_number = state.number
+        self.pixmap = pixmap
+
         layout = QVBoxLayout(self)
 
         self.setObjectName("state_frame")
@@ -42,13 +51,34 @@ class StateFrame(QFrame):
         self.picture_label.setObjectName("picture_label")
         self.picture_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.picture_label.setContentsMargins(0, 10, 0, 10)
-        self.picture_label.setPixmap(self.create_placeholder_pixmap())
+        self.picture_label.setPixmap(self.pixmap)
         layout.addWidget(self.picture_label)
 
         self.delete_button = QPushButton("🗑️ DELETE")
         self.delete_button.setObjectName("delete_button")
         self.delete_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.delete_button.clicked.connect(
+            lambda: self.delete_state.emit(self.game_name, self.state_number)
+        )
         layout.addWidget(self.delete_button)
+
+
+class CardsContainer(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.widget_layout = QHBoxLayout(self)
+
+    def add_state(self, name: str, state: State) -> StateCard:
+        pixmap = (
+            QPixmap.fromImage(QImage(str(state.image_path)))
+            if state.image_path
+            else self.create_placeholder_pixmap()
+        )
+        card = StateCard(name, state, pixmap)
+        self.widget_layout.addWidget(card)
+
+        return card
 
     def create_placeholder_pixmap(self) -> QPixmap:
         pixmap = QPixmap(320, 240)
@@ -63,50 +93,14 @@ class StateFrame(QFrame):
         return pixmap
 
 
-class StatesContainer(QScrollArea):
-    state_frames: list[QFrame]
-    update_container = Signal(str)
-
-    def __init__(self):
-        super().__init__()
-
-        self.setWidgetResizable(True)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setFixedWidth(800)
-
-        self.state_frames = []
-        self.container_widget = QWidget()
-        self.container_layout = QHBoxLayout(self.container_widget)
-        self.setWidget(self.container_widget)
-
-        self.update_container.connect(self.on_update_container_triggered)
-
-    @Slot(str)
-    def on_update_container_triggered(self, name: str):
-        for frame in self.state_frames:
-            self.container_layout.removeWidget(frame)
-            frame.deleteLater()
-
-        self.state_frames.clear()
-        layout = QHBoxLayout()
-
-        for state in manager.get_states(name):
-            state_frame = StateFrame(state.number)
-            self.state_frames.append(state_frame)
-            self.container_layout.addWidget(state_frame)
-
-    def wheelEvent(self, event: QWheelEvent) -> None:
-        delta = event.angleDelta().y()
-        if delta != 0:
-            scroll_bar = self.horizontalScrollBar()
-            scroll_bar.setValue(scroll_bar.value() - delta)
-            event.accept()
-        else:
-            super().wheelEvent(event)
-
-
 class RightPanel(QGroupBox):
-    states_container: StatesContainer
+    game: Game
+
+    cards_container: CardsContainer
+    scroll_area: QScrollArea
+    game_label: QLabel
+
+    delete_requested = Signal(str, int)
 
     def __init__(self):
         super().__init__()
@@ -119,10 +113,38 @@ class RightPanel(QGroupBox):
         self.game_label.setObjectName("game_label")
         layout.addWidget(self.game_label)
 
-        self.states_container = StatesContainer()
-        layout.addWidget(self.states_container)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setVerticalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
+        self.scroll_area.setFixedWidth(800)
+        self.scroll_area.wheelEvent = self.scroll_area_wheelEvent
+        layout.addWidget(self.scroll_area)
 
-    @Slot(str)
-    def on_updated_game(self, name: str):
-        self.game_label.setText(name)
-        self.states_container.update_container.emit(name)
+    def clear_container(self):
+        self.game_label.setText("")
+        if widget := self.scroll_area.widget():
+            widget.deleteLater()
+
+    @Slot(Game)
+    def update_cards(self, game: Game):
+        self.clear_container()
+        self.game = game
+        self.game_label.setText(game.name)
+        self.cards_container = CardsContainer()
+
+        for state in game.states:
+            card = self.cards_container.add_state(game.name, state)
+            card.delete_state.connect(self.delete_requested.emit)
+
+        self.scroll_area.setWidget(self.cards_container)
+
+    def scroll_area_wheelEvent(self, event: QWheelEvent):
+        delta = event.angleDelta().y()
+        if delta != 0:
+            scroll_bar = self.scroll_area.horizontalScrollBar()
+            scroll_bar.setValue(scroll_bar.value() - delta)
+            event.accept()
+        else:
+            super().wheelEvent(event)

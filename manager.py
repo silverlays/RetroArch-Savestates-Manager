@@ -1,15 +1,21 @@
 from pathlib import Path
 
+from PySide6.QtCore import QObject, Signal
+
 from settings import settings
 
 
 class State:
     number: int
     path: Path
+    image_path: Path | None
 
     def __init__(self, number: int, path: Path):
         self.number = number
         self.path = path
+
+        image_path = Path(str(f"{path}.png"))
+        self.image_path = image_path if image_path.exists() else None
 
 
 class Game:
@@ -29,42 +35,14 @@ class Game:
             self.states.append(state)
 
 
-class Manager:
+class Manager(QObject):
     games: list[Game]
+    update_needed = Signal()
 
     def __init__(self):
+        super().__init__()
         self.games = []
 
-    def add_game(
-        self, name: str, state_number: int | None = None, state_path: Path | None = None
-    ):
-        if not any(game.name == name for game in self.games):
-            if state_number and state_path:
-                self.games.append(Game(name, state_number, state_path))
-            else:
-                self.games.append(Game(name))
-
-    def games_string(self):
-        for game in self.games:
-            yield game.name
-
-    def get_states(self, name: str) -> list[State]:
-        if any(n.name == name for n in self.games):
-            game = [g for g in self.games if g.name == name][0]
-            return game.states
-        else:
-            return []
-
-    def get_states_count(self, name: str) -> int:
-        if any(n.name == name for n in self.games):
-            game = [g for g in self.games if g.name == name][0]
-            return len(game.states)
-        else:
-            return 0
-
-    @classmethod
-    def load(cls):
-        cls = cls()
         if settings.states_path:
             states = settings.states_path.rglob("*.state*")
 
@@ -79,14 +57,39 @@ class Manager:
                     game_name = state_path.stem
                     state_number = int(state_path.suffix.split(".state")[1])
 
-                if not any(g.name == game_name for g in cls.games):
-                    cls.games.append(Game(game_name, state_number, state_path))
+                if not self.get_game(game_name):
+                    self.games.append(Game(game_name, state_number, state_path))
                 else:
-                    game = [g for g in cls.games if g.name == game_name][0]
-                    game.add_state(State(state_number, state_path))
+                    if game := self.get_game(game_name):
+                        game.add_state(State(state_number, state_path))
 
-            cls.games.sort(key=lambda k: k.name)
-        return cls
+            self.games.sort(key=lambda k: k.name)
 
+    def delete_state(self, name: str, state_number: int):
+        # TODO Finish this
+        if game := self.get_game(name):
+            if state := self.get_state(name, state_number):
+                game.states.remove(state)
+                if len(game.states) == 0:
+                    self.games.remove(game)
+            self.update_needed.emit()
 
-manager = Manager.load()
+    def get_states(self, name: str) -> list[State]:
+        if game := self.get_game(name):
+            return game.states
+        else:
+            return []
+
+    def get_states_count(self, name: str) -> int:
+        if game := self.get_game(name):
+            return len(game.states)
+        else:
+            return 0
+
+    def get_game(self, name: str) -> Game | None:
+        return next((g for g in self.games if g.name == name), None)
+
+    def get_state(self, name: str, state_number: int) -> State | None:
+        if game := self.get_game(name):
+            return next((s for s in game.states if s.number == state_number), None)
+        return None
