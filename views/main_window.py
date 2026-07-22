@@ -32,6 +32,9 @@ class MainWindow(QWidget):
         # Right Panel
         self.splitter.addWidget(self.right_panel)
 
+        if self.left_panel.list_widget.count() > 0:
+            self.left_panel.list_widget.setCurrentRow(0)
+
         # Window Layout
         layout.addWidget(self.splitter)
 
