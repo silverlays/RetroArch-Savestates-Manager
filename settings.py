@@ -19,7 +19,7 @@ class Settings(QSettings):
     @property
     def retroarch_path(self) -> Path | None:
         path_settings = self.value("ra_path")
-        if path_settings and Path(path_settings).exists():
+        if path_settings and Path(path_settings).joinpath("states").exists():
             return Path(path_settings)
 
     @retroarch_path.setter
