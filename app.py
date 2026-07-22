@@ -159,6 +159,7 @@ QGroupBox::title {
 
 # endregion
 
+
 if __name__ == "__main__":
     app = QApplication()
     app.setOrganizationName(c.ORGANISATION_NAME)
