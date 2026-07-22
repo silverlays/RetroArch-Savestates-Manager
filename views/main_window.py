@@ -31,6 +31,10 @@ class MainWindow(QWidget):
         self.splitter.addWidget(self.left_panel)
 
         # Right Panel
+        self.right_panel.delete_confirmation.setChecked(settings.ask_confirmation)
+        self.right_panel.delete_confirmation.stateChanged.connect(
+            lambda c: setattr(settings, "ask_confirmation", bool(c))
+        )
         self.right_panel.delete_requested.connect(self.on_delete_state_request)
         self.splitter.addWidget(self.right_panel)
 

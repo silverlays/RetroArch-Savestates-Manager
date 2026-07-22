@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QSizePolicy,
+    QCheckBox,
 )
 
 from manager import Game, State
@@ -87,10 +88,11 @@ class CardsContainer(QWidget):
 # region RightPanel
 class RightPanel(QGroupBox):
     game: Game
-
     cards_container: CardsContainer
-    scroll_area: QScrollArea
+
     game_label: QLabel
+    scroll_area: QScrollArea
+    delete_confirmation: QCheckBox
 
     delete_requested = Signal(str, int)
 
@@ -113,6 +115,9 @@ class RightPanel(QGroupBox):
         self.scroll_area.setFixedWidth(800)
         self.scroll_area.wheelEvent = self.scroll_area_wheelEvent
         layout.addWidget(self.scroll_area)
+
+        self.delete_confirmation = QCheckBox("Ask confirmation before deleting")
+        layout.addWidget(self.delete_confirmation)
 
     def clear_container(self):
         self.game_label.setText("")
