@@ -45,11 +45,9 @@ class Game:
         self.add_state(State(number, pixmap, state_path))
 
     def add_state(self, state: State):
-        existing_state = next(
+        if existing_state := next(
             (s for s in self.states if s.number == state.number), None
-        )
-
-        if existing_state:
+        ):
             existing_state.pixmap = state.pixmap
         else:
             self.states.append(state)
