@@ -39,7 +39,7 @@ class Game:
     states: list[State]
     name: str
 
-    def __init__(self, name: str, number: int, pixmap: QPixmap):
+    def __init__(self, name: str, number: int, pixmap: QPixmap, state_path: Path):
         self.states = []
         self.name = name
         self.add_state(State(number, pixmap, state_path))
