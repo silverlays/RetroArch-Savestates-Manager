@@ -1,4 +1,4 @@
-# from PySide6.QtCore import *
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QComboBox, QDialogButtonBox
 
 
@@ -24,7 +24,7 @@ class ChangeSlotDialog(QDialog):
         self.old_slot_label = QLabel(
             f'Old slot number: <span style="color: #2ecc71; font-weight: bold;">{state_number}</span>'
         )
-        self.old_slot_label.setContentsMargins(0, 10, 0, 10)
+        self.old_slot_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.old_slot_label)
 
         # New Slot Combobox

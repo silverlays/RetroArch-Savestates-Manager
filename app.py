@@ -77,6 +77,7 @@ def get_style() -> str:
     QLabel[class="description"] {
         color: #aaaaaa;
         font-size: 11pt;
+        margin: 0 0 20px 0;
     }
 
     /* --- State Card (QFrame) --- */
@@ -159,6 +160,7 @@ def get_style() -> str:
         padding: 8px 12px;
         font-size: 11pt;
         font-weight: bold;
+        margin: 10px;
     }
     QComboBox:hover {
         background-color: #212121;
