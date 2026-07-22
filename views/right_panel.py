@@ -61,7 +61,6 @@ class StateCard(QFrame):
         self.change_slot_button = QPushButton("🔄 CHANGE SLOT")
         self.change_slot_button.setObjectName("change_slot_button")
         self.change_slot_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.change_slot_button.clicked.connect(self.on_change_slot_button_clicked)
         layout.addWidget(self.change_slot_button)
 
         # Delete Button
