@@ -1,22 +1,33 @@
+from dataclasses import dataclass
 from pathlib import Path
 
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import Qt, QObject, Signal
+from PySide6.QtGui import QPixmap, QImage, QColor, QPainter, QFont
 
 from settings import settings
 
 
 # region State
+@dataclass
 class State:
     number: int
-    path: Path
-    image_path: Path | None
+    pixmap: QPixmap
 
-    def __init__(self, number: int, path: Path):
-        self.number = number
-        self.path = path
+    @staticmethod
+    def create_pixmap(path: Path | None = None) -> QPixmap:
+        if path and path.exists():
+            return QPixmap(QImage(path).scaledToHeight(240))
+        else:
+            pixmap = QPixmap(426, 240)
+            pixmap.fill(QColor("#2b2b2b"))
 
-        image_path = Path(str(f"{path}.png"))
-        self.image_path = image_path if image_path.exists() else None
+            painter = QPainter(pixmap)
+            painter.setPen(QColor("#888888"))
+            painter.setFont(QFont("Arial", 10))
+            painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, "No Image")
+            painter.end()
+
+            return pixmap
 
 
 # endregion
@@ -27,16 +38,19 @@ class Game:
     states: list[State]
     name: str
 
-    def __init__(
-        self, name: str, number: int | None = None, state_path: Path | None = None
-    ):
+    def __init__(self, name: str, number: int, pixmap: QPixmap):
         self.states = []
         self.name = name
-        if number is not None and state_path is not None:
-            self.add_state(State(number, state_path))
+        self.add_state(State(number, pixmap))
 
     def add_state(self, state: State):
-        if not any(s.number == state.number for s in self.states):
+        existing_state = next(
+            (s for s in self.states if s.number == state.number), None
+        )
+
+        if existing_state:
+            existing_state.pixmap = state.pixmap
+        else:
             self.states.append(state)
 
 
@@ -55,22 +69,14 @@ class Manager(QObject):
         if settings.states_path:
             states = settings.states_path.rglob("*.state*")
 
-            for state_path in states:
-                if state_path.suffix == ".auto":
-                    game_name = state_path.stem.split(state_path.suffix[0])[0]
-                    state_number = -1
-                elif state_path.suffix == ".state":
-                    game_name = state_path.stem
-                    state_number = 0
-                else:
-                    game_name = state_path.stem
-                    state_number = int(state_path.suffix.split(".state")[1])
-
+            for path in states:
+                game_name, state_number, pixmap = self._extract_from_path(path)
                 game = self.get_game(game_name)
+
                 if not game:
-                    self.games.append(Game(game_name, state_number, state_path))
+                    self.games.append(Game(game_name, state_number, pixmap))
                 else:
-                    game.add_state(State(state_number, state_path))
+                    game.add_state(State(state_number, pixmap))
 
             self.games.sort(key=lambda k: k.name)
 
@@ -102,6 +108,26 @@ class Manager(QObject):
         if game := self.get_game(name):
             return next((s for s in game.states if s.number == state_number), None)
         return None
+
+    def _extract_from_path(self, path: Path):
+        if path.suffix == ".png":
+            game_name = path.stem.split(path.suffix[0])[0]
+            state_number = int(path.suffixes[0].split(".state")[1])
+            pixmap = State.create_pixmap(path)
+        elif path.suffix == ".auto":
+            game_name = path.stem.split(path.suffix[0])[0]
+            state_number = -1
+            pixmap = State.create_pixmap()
+        elif path.suffix == ".state":
+            game_name = path.stem
+            state_number = 0
+            pixmap = State.create_pixmap()
+        else:
+            game_name = path.stem
+            state_number = int(path.suffix.split(".state")[1])
+            pixmap = State.create_pixmap()
+
+        return (game_name, state_number, pixmap)
 
 
 # endregion

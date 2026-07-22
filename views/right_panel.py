@@ -27,12 +27,12 @@ class StateCard(QFrame):
 
     delete_state = Signal(str, int)
 
-    def __init__(self, game_name: str, state: State, pixmap: QPixmap):
+    def __init__(self, game_name: str, state: State):
         super().__init__()
 
         self.game_name = game_name
         self.state_number = state.number
-        self.pixmap = pixmap
+        self.pixmap = state.pixmap
 
         layout = QVBoxLayout(self)
 
@@ -50,8 +50,8 @@ class StateCard(QFrame):
 
         self.picture_label = QLabel()
         self.picture_label.setObjectName("picture_label")
-        self.picture_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.picture_label.setContentsMargins(0, 10, 0, 10)
+        self.picture_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.picture_label.setPixmap(self.pixmap)
         layout.addWidget(self.picture_label)
 
@@ -75,27 +75,10 @@ class CardsContainer(QWidget):
         self.widget_layout = QHBoxLayout(self)
 
     def add_state(self, name: str, state: State) -> StateCard:
-        pixmap = (
-            QPixmap.fromImage(QImage(str(state.image_path)))
-            if state.image_path
-            else self.create_placeholder_pixmap()
-        )
-        card = StateCard(name, state, pixmap)
+        card = StateCard(name, state)
         self.widget_layout.addWidget(card)
 
         return card
-
-    def create_placeholder_pixmap(self) -> QPixmap:
-        pixmap = QPixmap(320, 240)
-        pixmap.fill(QColor("#2b2b2b"))
-
-        painter = QPainter(pixmap)
-        painter.setPen(QColor("#888888"))
-        painter.setFont(QFont("Arial", 10))
-        painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, "No Image")
-        painter.end()
-
-        return pixmap
 
 
 # endregion
