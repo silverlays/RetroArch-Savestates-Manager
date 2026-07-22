@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, Signal, Slot
-from PySide6.QtGui import QPixmap, QImage, QPainter, QColor, QFont, QWheelEvent
+from PySide6.QtGui import QPixmap, QWheelEvent
 from PySide6.QtWidgets import (
     QGroupBox,
     QFrame,
