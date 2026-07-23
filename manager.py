@@ -82,7 +82,6 @@ class Manager(QObject):
             self.games.sort(key=lambda k: k.name)
 
     def delete_state(self, name: str, state_number: int):
-        # TODO delete_state() Implement real delete
         if game := self.get_game(name):
             if state := self.get_state(name, state_number):
                 game.states.remove(state)
