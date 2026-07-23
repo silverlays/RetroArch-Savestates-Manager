@@ -88,6 +88,7 @@ class Manager(QObject):
                 game.states.remove(state)
                 if len(game.states) == 0:
                     self.games.remove(game)
+                    state.state_path.unlink()
             self.update_needed.emit()
 
     def get_states(self, name: str) -> list[State]:
