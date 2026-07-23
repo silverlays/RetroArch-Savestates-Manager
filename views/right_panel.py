@@ -141,7 +141,7 @@ class RightPanel(QGroupBox):
         self.scroll_area.wheelEvent = self.scroll_area_wheelEvent
         layout.addWidget(self.scroll_area)
 
-        self.delete_confirmation = QCheckBox("Ask confirmation before deleting")
+        self.delete_confirmation = QCheckBox("Ask confirmation before delete")
         layout.addWidget(self.delete_confirmation)
 
     def clear_container(self):
