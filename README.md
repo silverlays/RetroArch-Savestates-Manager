@@ -2,6 +2,8 @@
 
 A lightweight, modern desktop application built with Python and PySide6 designed to inspect, manage, and clean up your RetroArch save states. Easily browse through your save state library across different cores and games, preview screenshot thumbnails, switch save slots, and safely delete unwanted states from a clean graphical interface.
 
+<img width="2326" height="1097" alt="image" src="https://github.com/user-attachments/assets/585dde12-3b40-44cc-a409-fc39335cf137" />
+
 ---
 
 ## 🌟 Features
