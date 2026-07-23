@@ -153,7 +153,9 @@ class RightPanel(QGroupBox):
     def update_cards(self, game: Game):
         self.clear_container()
         self.game = game
-        self.game_label.setText(f"({game.emulator}) {game.name}")
+        self.game_label.setText(
+            f"<span style='background-color: #2D2D2D; color: #AAAAAA; padding: 2px 8px; border-radius: 4px; font-size: 0.9em;'>{game.emulator}</span> {game.name}"
+        )
         self.cards_container = CardsContainer()
 
         for state in game.states:
