@@ -1,4 +1,3 @@
-import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -128,8 +127,7 @@ class Manager(QObject):
                     game.states.remove(old_state)
                     new_state = self._convert_state_number(old_state, new_slot_number)
                     game.add_state(new_state)
-                    shutil.copy(old_state.state_path, new_state.state_path)
-                    old_state.state_path.unlink()
+                    old_state.state_path.rename(new_state.state_path)
 
         self.update_needed.emit()
 
