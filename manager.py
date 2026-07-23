@@ -1,3 +1,4 @@
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -38,10 +39,14 @@ class State:
 class Game:
     states: list[State]
     name: str
+    emulator: str
 
-    def __init__(self, name: str, number: int, pixmap: QPixmap, state_path: Path):
+    def __init__(
+        self, name: str, emulator: str, number: int, pixmap: QPixmap, state_path: Path
+    ):
         self.states = []
         self.name = name
+        self.emulator = emulator
         self.add_state(State(number, pixmap, state_path))
 
     def add_state(self, state: State):
@@ -71,11 +76,15 @@ class Manager(QObject):
             states = settings.states_path.rglob("*.state*")
 
             for path in states:
-                game_name, state_number, pixmap = self._extract_from_path(path)
+                game_name, emulator, state_number, pixmap = self._extract_from_path(
+                    path
+                )
                 game = self.get_game(game_name)
 
                 if not game:
-                    self.games.append(Game(game_name, state_number, pixmap, path))
+                    self.games.append(
+                        Game(game_name, emulator, state_number, pixmap, path)
+                    )
                 else:
                     game.add_state(State(state_number, pixmap, path))
 
@@ -111,44 +120,53 @@ class Manager(QObject):
         return None
 
     def move_slot(self, name: str, state_number: int, new_slot_number: int):
-        # TODO move_slot() Implement real slot change
         if game := self.get_game(name):
-            if state := self.get_state(name, state_number):
-                pixmap = state.pixmap
-                state_path = state.state_path
-
+            if old_state := self.get_state(name, state_number):
                 if not next(
                     (s for s in game.states if s.number == new_slot_number), None
                 ):
-                    # FIXME Handle pixmap switch
-                    game.states.remove(state)
-                    game.add_state(State(new_slot_number, pixmap, state_path))
+                    game.states.remove(old_state)
+                    new_state = self._convert_state_number(old_state, new_slot_number)
+                    game.add_state(new_state)
+                    shutil.copy(old_state.state_path, new_state.state_path)
+                    old_state.state_path.unlink()
 
         self.update_needed.emit()
 
     def _extract_from_path(self, path: Path):
+        emulator = path.parts[-2]
         if path.suffix == ".png":
-            emulator = path.parts[-2]
             game_name = path.stem.split(path.suffix[0])[0]
             state_number = int(path.suffixes[0].split(".state")[1])
             pixmap = State.create_pixmap(path)
         elif path.suffix == ".auto":
-            emulator = path.parts[-2]
             game_name = path.stem.split(path.suffix[0])[0]
             state_number = -1
             pixmap = State.create_pixmap()
         elif path.suffix == ".state":
-            emulator = path.parts[-2]
             game_name = path.stem
             state_number = 0
             pixmap = State.create_pixmap()
         else:
-            emulator = path.parts[-2]
             game_name = path.stem
             state_number = int(path.suffix.split(".state")[1])
             pixmap = State.create_pixmap()
 
-        return (f"{game_name} -- {emulator}", state_number, pixmap)
+        return game_name, emulator, state_number, pixmap
+
+    def _convert_state_number(self, old_state: State, target_number: int) -> State:
+        old_state_path = old_state.state_path
+        old_game_name, _, _, _ = self._extract_from_path(old_state_path)
+
+        if target_number == -1:
+            new_suffix = ".state.auto"
+        elif target_number == 0:
+            new_suffix = ".state"
+        else:
+            new_suffix = f".state{target_number}"
+
+        new_state_path = Path(old_state_path.parent) / f"{old_game_name}{new_suffix}"
+        return State(target_number, old_state.pixmap, new_state_path)
 
 
 # endregion

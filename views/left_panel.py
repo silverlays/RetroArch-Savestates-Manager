@@ -24,7 +24,7 @@ class GameList(QListWidget):
         self.clear()
 
         for game in game_list:
-            self.addItem(game.name)
+            self.addItem(f"{game.name} -- {game.emulator}")
 
         needed_width = self.sizeHintForColumn(0)
         needed_width += self.frameWidth() * 2

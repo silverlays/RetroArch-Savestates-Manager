@@ -52,7 +52,7 @@ class MainWindow(QWidget):
 
     @Slot(str)
     def on_game_selection_changed(self, name: str):
-        if game := self.manager.get_game(name):
+        if game := self.manager.get_game(name.split(" -- ")[0]):
             self.right_panel.update_cards(game)
 
     @Slot(str, int, int)
