@@ -92,28 +92,12 @@ class StateCard(QFrame):
 # endregion
 
 
-# region CardsContainer
-class CardsContainer(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        self.widget_layout = QHBoxLayout(self)
-
-    def add_state(self, name: str, state: State) -> StateCard:
-        card = StateCard(name, state)
-        self.widget_layout.addWidget(card)
-
-        return card
-
-
-# endregion
-
-
 # region RightPanel
 class RightPanel(QGroupBox):
     game: Game
-    cards_container: CardsContainer
 
+    cards_widget: QWidget
+    cards_layout: QHBoxLayout
     game_label: QLabel
     scroll_area: QScrollArea
     delete_confirmation: QCheckBox
@@ -156,14 +140,16 @@ class RightPanel(QGroupBox):
         self.game_label.setText(
             f"<span style='background-color: #2D2D2D; color: #AAAAAA; padding: 2px 8px; border-radius: 4px; font-size: 0.9em;'>{game.emulator}</span> {game.name}"
         )
-        self.cards_container = CardsContainer()
+        self.cards_widget = QWidget()
+        self.cards_layout = QHBoxLayout(self.cards_widget)
 
         for state in game.states:
-            card = self.cards_container.add_state(game.name, state)
+            card = StateCard(game.name, state)
+            self.cards_layout.addWidget(card)
             card.change_slot.connect(self.change_slot_requested.emit)
             card.delete_state.connect(self.delete_requested.emit)
 
-        self.scroll_area.setWidget(self.cards_container)
+        self.scroll_area.setWidget(self.cards_widget)
 
     def scroll_area_wheelEvent(self, event: QWheelEvent):
         delta = event.angleDelta().y()
